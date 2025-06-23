@@ -74,7 +74,7 @@ export async function triggerTestWebhook() {
   const res = await fetch('/api/webhook', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(dummyPayload),
+    body: JSON.stringify(dummyData),
   });
 
   const result = await res.json();

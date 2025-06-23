@@ -2,8 +2,29 @@
 
 import { useEffect, useState } from 'react';
 
+type WebhookData = {
+  id: string;
+  name: string;
+  email: string;
+  website?: string;
+  offeredshare?: string;
+  whyTarget?: string;
+  whyNow?: string;
+  solution?: string;
+  problems?: string;
+  primaryCompetitors?: string;
+  buyersTitles?: string;
+  anticipatedOrderValue?: number;
+  averageCommissionRate?: string;
+  anticipatedCommission?: number;
+  anticipatedROI?: string;
+  receivedFrom?: string;
+  receivedAt?: string;
+};
+ 
+
 export default function WebhookViewer() {
-  const [webhooks, setWebhooks] = useState([]);
+  const [webhooks, setWebhooks] = useState<WebhookData[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Function to send dummy webhook

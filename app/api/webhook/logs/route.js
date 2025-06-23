@@ -12,6 +12,8 @@ export async function GET() {
 
     return Response.json(data);
   } catch (err) {
+    console.errror(err);
     return Response.json({ error: 'Failed to fetch logs' }, { status: 500 });
+
   }
 }
