@@ -1,103 +1,84 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useEffect, useState } from 'react';
+
+export default function WebhookViewer() {
+  const [webhooks, setWebhooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Function to send dummy webhook
+  const sendTestWebhook = async () => {
+    const dummyPayload = {
+      id: "99999",
+      name: "Demo Trigger Corp",
+      email: "demo@trigger.com",
+      website: "https://trigger.test",
+      offeredshare: "5% Equity",
+      whyTarget: "Test view-webhooks trigger",
+      whyNow: "Just testing",
+      anticipatedOrderValue: 42000,
+      anticipatedCommission: 3200,
+      anticipatedROI: "3x in 1 year",
+      receivedFrom: "View Webhooks Page",
+    };
+
+    await fetch('/api/webhook', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dummyPayload),
+    });
+  };
+
+  useEffect(() => {
+    async function run() {
+      await sendTestWebhook(); // ✅ Simulate the webhook call
+      const res = await fetch('/api/webhook/logs');
+      const data = await res.json();
+      setWebhooks(data);
+      setLoading(false);
+    }
+    run();
+  }, []);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <main className="max-w-5xl mx-auto py-10 px-4">
+      <h1 className="text-2xl font-bold mb-6">📦 Received Webhooks</h1>
+      {loading ? (
+        <p>Loading...</p>
+      ) : webhooks.length === 0 ? (
+        <p>No webhook data found.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full border">
+            <thead className="bg-gray-600">
+              <tr>
+                <th className="text-left p-2 border">Name</th>
+                <th className="text-left p-2 border">Email</th>
+                <th className="text-left p-2 border">Order Value</th>
+                <th className="text-left p-2 border">ROI</th>
+                <th className="text-left p-2 border">Source</th>
+                <th className="text-left p-2 border">Received At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {webhooks.map((item, i) => (
+                <tr key={i} className="border-t">
+                  <td className="p-2 border">{item.name || '-'}</td>
+                  <td className="p-2 border">{item.email || '-'}</td>
+                  <td className="p-2 border">{item.anticipatedOrderValue || '-'}</td>
+                  <td className="p-2 border">{item.anticipatedROI || '-'}</td>
+                  <td className="p-2 border">{item.receivedFrom || '-'}</td>
+                  <td className="p-2 border">
+                    {item.receivedAt
+                      ? new Date(item.receivedAt).toLocaleString()
+                      : '-'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      )}
+    </main>
   );
 }
